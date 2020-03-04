@@ -1,0 +1,43 @@
+- name: "Install app node" #exercício aula 4 Ansible (slide 14)
+  hosts: aula
+  become: yes #usar root (autenticação) do grupo "aula"
+  vars:
+    path_app: /usr/app
+  tasks: #não aceita - name sem módulos
+    - name: "Criar o diretório" #primeira task 1.a
+      file: 
+        path: "{{path_app}}" #quando se usa "vars" (alí antes de tasks) deve se usar as aspas
+        state: directory
+        mode: '0755' #permissão
+
+        #cada vez que criar uma task pode dar um check no playbook, pelo terminal, para verificar a sintaxe
+    
+    # - name: Create a directory if it does not exist
+    #   file:
+    #     path: /etc/some_directory
+    #     state: directory
+    #     mode: '0755'
+
+    - name: "Instalar a dependência unzip" #segunda task 1.b
+      package: #mesmo do arquivo install-node.yml
+        name:
+          - unzip
+        state: present
+    
+    - name: "Download e descompactar" #terceira task 1.c
+      unarchive:
+        src: #link da aplicação node desejada
+        dest: "{{path_app}}"
+        remote_src: yes
+
+    # - name: Unarchive a file that needs to be downloaded (added in 2.0)
+    #   unarchive:
+    #     src: https://example.com/example.zip
+    #     dest: /usr/local/bin
+    #     remote_src: yes
+
+    # - name: "Compilando app" #quarta task 1.d.i npm install: pegar dependência do node, baixar e intalar essa dependência
+
+    # - name: "Gerenciador node pm2" #task 1.d.ii
+
+    # - name: "Rodar a app" #task 1.d.iii - torna a aplicação disponível para rodar
