@@ -1,0 +1,31 @@
+---
+  - name: "Install app nodejs"
+    hosts: aula
+    become: yes
+    vars:
+      path_app: /usr/app
+      app_name: app_node2-master
+    tasks:
+      - name: Linux - Install unzip
+        package:
+          name:
+            - unzip
+          state: present
+
+      - name: Create dir app
+        file:
+          path: "{{path_app}}"
+          state: directory
+
+      - name: Download and Save app
+        unarchive:
+          src: 
+          dest: "{{path_app}}"
+          remote_src: yes
+        register: download_app
+      
+      - name: Install packages based con package.json
+        npm:
+          path: "{{path_app}}/{{app_name}}"
+        when: download_app is success
+        register: install_packages_app

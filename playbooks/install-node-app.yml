@@ -1,8 +1,9 @@
-- name: "Install app node" #exercício aula 4 Ansible (slide 14)
+- name: "Install app node.js" #exercício aula 4 Ansible (slide 14)
   hosts: aula
   become: yes #usar root (autenticação) do grupo "aula"
   vars:
     path_app: /usr/app
+    app_name: app_node2_master
   tasks: #não aceita - name sem módulos
     - name: "Criar o diretório" #primeira task 1.a
       file: 
@@ -24,11 +25,12 @@
           - unzip
         state: present
     
-    - name: "Download e descompactar" #terceira task 1.c
+    - name: Download_app #terceira task 1.c, criando diretório app
       unarchive:
-        src: #link da aplicação node desejada
+        src: https://github.com/bgsouza/app_node2/archive/master.zip #link da aplicação node desejada
         dest: "{{path_app}}"
         remote_src: yes
+      register: download_app
 
     # - name: Unarchive a file that needs to be downloaded (added in 2.0)
     #   unarchive:
@@ -36,8 +38,17 @@
     #     dest: /usr/local/bin
     #     remote_src: yes
 
-    # - name: "Compilando app" #quarta task 1.d.i npm install: pegar dependência do node, baixar e intalar essa dependência
-
+    - name: Instala pacote pm2 #quarta task 1.d.i npm install: pegar dependência do node, baixar e intalar essa dependência
+      npm:
+        name: pm2
+        path: "{{path_app}}/{{app_name}}"
+        global: yes
+        state: present
+      when: download_app is success
+      register: install_packages
     # - name: "Gerenciador node pm2" #task 1.d.ii
 
-    # - name: "Rodar a app" #task 1.d.iii - torna a aplicação disponível para rodar
+    - name: "Rodar a app" #task 1.d.iii - torna a aplicação disponível para rodar
+      command:
+        cmd: pm2 start {{path_app}}/{{app_name}}/app.js
+      when: install_package is success
