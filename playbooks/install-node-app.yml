@@ -3,7 +3,7 @@
   become: yes #usar root (autenticação) do grupo "aula"
   vars:
     path_app: /usr/app
-    app_name: app_node2_master
+    app_name: app_node2-master
   tasks: #não aceita - name sem módulos
     - name: "Criar o diretório" #primeira task 1.a
       file: 
@@ -43,12 +43,13 @@
         name: pm2
         path: "{{path_app}}/{{app_name}}"
         global: yes
+        production: yes
         state: present
       when: download_app is success
-      register: install_packages
+      register: install_package
     # - name: "Gerenciador node pm2" #task 1.d.ii
 
     - name: "Rodar a app" #task 1.d.iii - torna a aplicação disponível para rodar
-      command:
-        cmd: pm2 start {{path_app}}/{{app_name}}/app.js
-      when: install_package is success
+      command: pm2 start "{{path_app}}"/"{{app_name}}"/app.js
+      become: yes
+
