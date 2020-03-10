@@ -41,20 +41,30 @@
     - name: Instala pacote pm2 #quarta task 1.d.i npm install: pegar dependência do node, baixar e intalar essa dependência
       npm:
         name: pm2
-        path: "{{path_app}}/{{app_name}}"
+        # path: "{{path_app}}/{{app_name}}"
         global: yes
-        production: yes
+        # production: yes
         state: present
+      # when: download_app is success
+      # register: install_packages
+
+
+    - name: instala pacote
+      npm:
+        path: "{{path_app}}/{{app_name}}"
       when: download_app is success
-      register: install_package
+      register: install_packages_app        
+      
     # - name: "Gerenciador node pm2" #task 1.d.ii
 
     # - name: "Rodar a app" #task 1.d.iii - torna a aplicação disponível para rodar
     #   command: pm2 start "{{path_app}}"/"{{app_name}}"/app.js
     #   become: yes
-    - name: Delete old pm2 process
-      command: pm2 delete ws-node
-      ignore_errors: yes
+    
+    # - name: Delete old pm2 process
+    #   command: pm2 delete ws-node
+    #   ignore_errors: yes
 
-    - name: Start pm2
+    - name: Start pm2 app
       command: pm2 start {{path_app}}/{{app_name}}/app.js
+      when: install_packages_app is success
