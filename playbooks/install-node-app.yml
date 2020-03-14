@@ -40,20 +40,13 @@
 
     - name: Instala pacote pm2 #quarta task 1.d.i npm install: pegar dependência do node, baixar e intalar essa dependência
       npm:
-        name: pm2
-        # path: "{{path_app}}/{{app_name}}"
-        global: yes
-        # production: yes
-        state: present
-      # when: download_app is success
-      # register: install_packages
-
-
-    - name: instala pacote
-      npm:
+        name: pm2 #Gerenciador de processos para node
         path: "{{path_app}}/{{app_name}}"
+        global: yes
+        production: yes
+        state: present
       when: download_app is success
-      register: install_packages_app        
+      register: install_packages    
       
     # - name: "Gerenciador node pm2" #task 1.d.ii
 
@@ -67,4 +60,4 @@
 
     - name: Start pm2 app
       command: pm2 start {{path_app}}/{{app_name}}/app.js
-      when: install_packages_app is success
+      when: install_packages is success
